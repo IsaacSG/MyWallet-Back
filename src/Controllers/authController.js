@@ -9,13 +9,13 @@ export async function signIn (req, res) {
         const validate = authSignInSchema.validate(user);
 
         if(validate.error) {
-            return res.status(422).send("Email ou senha inválidos");
+            return res.status(422).send("Preencha todos os campos");
         }
         
         const verifyUser = await db.collection('users').findOne({ email: user.email});
 
         if(!verifyUser) {
-            return res.staus(422).send("Email ou senha inválidos");
+            return res.status(422).send("Email ou senha inválidos");
         }
 
         const hashPassword = bcrypt.compareSync(user.password, verifyUser.password);
@@ -28,12 +28,12 @@ export async function signIn (req, res) {
             return  res.status(200).send({token, name: verifyUser.name});
         }
 
-        res.status(200);
+        return res.sendStatus(200);
     }
 
     catch(error) {
         console.log(error)
-        res.status(500);
+        return res.sendStatus(500);
 
     }
 }
@@ -48,6 +48,7 @@ export async function signUp (req, res) {
             return res.status(422).send("Preencha todos os campos");
         }
         const hashPassword = bcrypt.hashSync(user.password, 10);
+        console.log(user);
 
         await db.collection('users').insertOne({
             name: user.name,
@@ -55,11 +56,11 @@ export async function signUp (req, res) {
             password: hashPassword
         });
 
-        res.status(201);
+        return res.sendStatus(201);
     }
 
     catch(error) {
         console.log(error);
-        res.status(500);
+        return res.sendStatus(500);
     }
 }
